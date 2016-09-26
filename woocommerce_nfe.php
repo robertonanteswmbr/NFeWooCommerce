@@ -336,13 +336,13 @@ class WooCommerceNFe {
 				if (isset($response->log)){
 
 					if ($response->log->xMotivo){
-						
+
 						if(isset($response->log->aProt[0]->xMotivo)){
 							$error = $response->log->aProt[0]->xMotivo;
 						}else{
 							$error = $response->log->xMotivo;
 						}
-						
+
 						$mensagem .= '<li>'.$error.'</li>';
 
 					} else {
@@ -399,33 +399,33 @@ class WooCommerceNFe {
         $data = array();
 
         if ($coupons){
-            
+
             foreach($coupons as $coupon_code){
                 $coupon_obj = new WC_Coupon($coupon_code);
                 if($coupon_obj->discount_type == 'percent'){
                     $coupons_percentage[] = $coupon_obj->coupon_amount;
                 }
             }
-            
+
         }
-        
+
 		if ($order->get_fees()){
-            
+
             foreach ($order->get_fees() as $key => $item){
-            
+
                 if ($item['line_total'] < 0){
-                    
-                    $discount = $item['line_total']*-1;
+
+                    $discount = abs($item['line_total']);
                     $total_discount = $discount + $total_discount;
-                    
+
                 } else {
-                    
+
                     $codigo_ean = get_option('wc_settings_woocommercenfe_ean');
                     $codigo_ncm = get_option('wc_settings_woocommercenfe_ncm');
                     $codigo_cest = get_option('wc_settings_woocommercenfe_cest');
                     $origem = get_option('wc_settings_woocommercenfe_origem');
                     $imposto = get_option('wc_settings_woocommercenfe_imposto');
-                    
+
                     $data['produtos'][] = array(
                         'nome' => $item['name'], // Nome do produto
                         'sku' => '', // Código identificador - SKU
@@ -440,15 +440,15 @@ class WooCommerceNFe {
                         'total' => number_format($item['line_total'], 2), // Preço total (quantidade x preço unitário) - sem descontos
                         'classe_imposto' => $imposto // Referência do imposto cadastrado
                     );
-                    
+
                 }
-            
+
             }
-            
+
         }
-        
-        $total_discount = $order->get_total_discount() + $total_discount;
-        
+
+        $total_discount = number_format($order->get_total_discount() + $total_discount, 2);
+
 		// Order
 		$data = array(
 			'ID' => $post_id, // Número do pedido
@@ -535,14 +535,14 @@ class WooCommerceNFe {
 			if($ignorar_nfe == 1 || $order->get_item_subtotal( $item, false, false ) == 0){
 
 				$data['pedido']['total'] -= $item['line_subtotal'];
-                
+
                 if ($coupons_percentage){
-                    
+
                     foreach($coupons_percentage as $percentage){
                         $data['pedido']['total'] += ($percentage/100)*$item['line_subtotal'];
                         $data['pedido']['desconto'] -= ($percentage/100)*$item['line_subtotal'];
                     }
-                    
+
                 }
 
 				$data['pedido']['total'] = number_format($data['pedido']['total'], 2);
@@ -588,6 +588,7 @@ class WooCommerceNFe {
 
 				}
 
+				$product_normal_price = $order->get_item_subtotal( $item, false, false );
 				$data['produtos'][] = array(
 					'nome' => $item['name'].$variacoes, // Nome do produto
 					'sku' => $product->get_sku(), // Código identificador - SKU
@@ -598,8 +599,8 @@ class WooCommerceNFe {
 					'unidade' => 'UN', // Unidade de medida da quantidade de itens
 					'peso' => $peso, // Peso em KG. Ex: 800 gramas = 0.800 KG
 					'origem' => (int) $origem, // Origem do produto
-					'subtotal' => number_format($order->get_item_subtotal( $item, false, false ), 2), // Preço unitário do produto - sem descontos
-					'total' => number_format($order->get_line_total( $item, false, false ), 2), // Preço total (quantidade x preço unitário) - sem descontos
+					'subtotal' => number_format($product_normal_price, 2), // Preço unitário do produto - sem descontos
+					'total' => number_format($product_normal_price*$item['qty'], 2), // Preço total (quantidade x preço unitário) - sem descontos
 					'classe_imposto' => $imposto // Referência do imposto cadastrado
 				);
 
