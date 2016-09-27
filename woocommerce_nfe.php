@@ -475,14 +475,14 @@ class WooCommerceNFe {
 		//Informações Complementares ao Fisco
 		$fisco_inf = get_option('wc_settings_woocommercenfe_fisco_inf');
 
-		if(!empty($fiscoinf) && strlen($fiscoinf) <= 2000){
+		if(!empty($fisco_inf) && strlen($fisco_inf) <= 2000){
 			$data['pedido']['informacoes_fisco'] = $fisco_inf;
 		}
 
 		//Informações Complementares ao Consumidor
 		$consumidor_inf = get_option('wc_settings_woocommercenfe_cons_inf');
 
-		if(!empty($consumidorinf) && strlen($consumidorinf) <= 2000){
+		if(!empty($consumidor_inf) && strlen($consumidor_inf) <= 2000){
 			$data['pedido']['informacoes_complementares'] = $consumidorinf;
 		}
 
