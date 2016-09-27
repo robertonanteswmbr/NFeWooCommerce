@@ -483,7 +483,7 @@ class WooCommerceNFe {
 		$consumidor_inf = get_option('wc_settings_woocommercenfe_cons_inf');
 
 		if(!empty($consumidor_inf) && strlen($consumidor_inf) <= 2000){
-			$data['pedido']['informacoes_complementares'] = $consumidorinf;
+			$data['pedido']['informacoes_complementares'] = $consumidor_inf;
 		}
 
 		// Customer
