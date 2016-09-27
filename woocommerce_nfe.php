@@ -644,7 +644,36 @@ class WooCommerceNFe {
 
 			return $info;
 
+	}
+
+	function set_bundle_products_array( $bundles, $order ){
+
+		$total_bundle = 0;
+		$total_products = 0;
+
+		$bundle_products = array();
+
+		foreach($bundles as $item){
+			$product = $order->get_product_from_item( $item );
+			$product_type = $product->get_type();
+			$product_price = $product->get_price();
+
+			if(isset($item['bundled_by'])){
+				$total_products += $product_price;
+				if(!isset($bundle_products[$item['product_id']])){
+					$bundle_products[$item['product_id']] = $this->get_product_nfe_info($item, $order);
+					$bundle_products[$item['product_id']]['subtotal'] = number_format($product_price, 2);
+					$bundle_products[$item['product_id']]['total'] = number_format($product_price, 2);
+				}else{
+					$new_qty = ((int)$bundle_products[$item['product_id']]['quantidade']) + 1;
+					$new_total = $new_qty * $product_price;
+					$bundle_products[$item['product_id']]['quantidade'] = $new_qty;
 					$bundle_products[$item['product_id']]['total'] = number_format($new_total, 2);
+				}
+
+			}elseif($product_type == 'yith_bundle'){
+				$total_bundle += $product_price;
+			}
 		}
 
 		$discount = abs($total_bundle - $total_products);
